@@ -5,19 +5,25 @@ import Ammunition.AmmunitionItem;
 import Ammunition.Armor.Armor;
 import Ammunition.Weapons.Weapon;
 import Menu.Command;
+import Logger.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static Logger.ViaMail.sendMessage;
 
 public class SaveBoughtItems implements Command {
     Knight knight;
+    private static final Logger logger = Logger.getLogger(SaveBoughtItems.class.getName());
 
     public SaveBoughtItems(Knight knight) {
         this.knight = knight;
     }
     public void execute() {
+        Log.setupLogger(logger);
         try {
             String FilePath = "E:\\2 курс\\1 сем\\ПП\\Ammunition\\ammunitionFor" + knight.getLogin() + ".txt";
             File file = new File(FilePath);
@@ -35,10 +41,14 @@ public class SaveBoughtItems implements Command {
 
                 }
             }
+            logger.log(Level.INFO, "all bought items successfully saved");
             pw.close();
         }
         catch (IOException e){
+            logger.log(Level.INFO, "file not found");
             System.out.println("Файл не знайдено");
+            sendMessage("Critical error occurred: " + e + "\nFile with ammunition items not found");
+            new Exit().execute();
         }
     }
 }

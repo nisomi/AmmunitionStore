@@ -1,6 +1,7 @@
 package Ammunition;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 public abstract class AmmunitionItem {
     protected String name;
@@ -47,7 +48,6 @@ public abstract class AmmunitionItem {
     public void setDescription(String description) {
         this.description = description;
     }
-
     public String getType() {
         return type;
     }
@@ -55,7 +55,6 @@ public abstract class AmmunitionItem {
     public void setType(String type) {
         this.type = type;
     }
-
     @Override
     public String toString() {
         return  type + " : " + "\n\t" +
@@ -77,6 +76,18 @@ public abstract class AmmunitionItem {
         public int compare(AmmunitionItem item1, AmmunitionItem item2){
             return Integer.compare(item1.weight, item2.weight);
         }
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AmmunitionItem item = (AmmunitionItem) o;
+        return  Objects.equals(name, item.name) &&
+                Objects.equals(description, item.description) &&
+                cost == item.cost &&
+                weight == item.weight;
     }
 
 }

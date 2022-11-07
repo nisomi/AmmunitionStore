@@ -6,8 +6,11 @@ import Accounts.Seller;
 import Ammunition.AmmunitionItem;
 import Menu.Commands.*;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class Menu {
     private Switcher switcher;
@@ -32,7 +35,7 @@ public class Menu {
             options.add("1. Купити амуніцію");
             switcher.addCommand(new BuyItem(((Knight) account), ammunition, accounts));
             options.add("2. Викинути амуніцію");
-            switcher.addCommand(new TrowAwayItem((Knight) account, accounts));
+            switcher.addCommand(new ThrowAwayItem((Knight) account));
             options.add("3. Повернути амуніцію");
             switcher.addCommand(new ReturnItem(((Knight) account), ammunition, accounts));
             options.add("4. Показати баланс ");
@@ -43,8 +46,8 @@ public class Menu {
             switcher.addCommand(new ShowAllAmmunition(ammunition));
             options.add("7. Показати куплену амуніцію");
             switcher.addCommand(new ShowAllAmmunition(((Knight) account).getAmmunitionItems()));
-            options.add("8. Вийти");
-            switcher.addCommand(new Exit(ammunition, (Knight) account, accounts));
+            options.add("8. Вийти з акаунту");
+            switcher.addCommand(new Exit(ammunition, account, accounts));
         }
         else {
             options.add("1. Додати амуніцію");
@@ -55,12 +58,12 @@ public class Menu {
             switcher.addCommand(new ShowWalletBalance(account));
             options.add("4. Показати всю амуніцію");
             switcher.addCommand(new ShowAllAmmunition(ammunition));
-            options.add("5. Вийти");
-            switcher.addCommand(new Exit(ammunition, accounts));
+            options.add("5. Вийти з акаунту");
+            switcher.addCommand(new Exit(ammunition,account, accounts));
         }
     }
 
-    public void makeChoice(Integer number){
+    public void makeChoice(Integer number) {
         switcher.execute(number);
     }
 

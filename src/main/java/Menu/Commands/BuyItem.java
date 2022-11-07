@@ -5,11 +5,16 @@ import Accounts.Knight;
 import Accounts.Seller;
 import Ammunition.AmmunitionItem;
 import Menu.Command;
-
+import Logger.*;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BuyItem implements Command {
+    private static final Logger logger = Logger.getLogger(BuyItem.class.getName());
+
     private List<Account> accounts;
     private Knight knight;
     private List<AmmunitionItem> ammunitionItemList;
@@ -27,17 +32,21 @@ public class BuyItem implements Command {
                 System.out.println(i+1 + "." + ammunitionItemList.get(i));
             }
             System.out.println("Введіть номер елементу, який хочете купити:");
-            int key = scanner.nextInt();
-            if(key >= 0 && key <= ammunitionItemList.size()) {
-                PaySeller(key);
-                break;
+            try {
+                int key = scanner.nextInt();
+                if (key >= 0 && key <= ammunitionItemList.size()) {
+                    PaySeller(key);
+                    break;
+                } else
+                    System.out.println("Введіть коректне значення");
+            }catch (InputMismatchException | NumberFormatException e) {
+                System.out.println("Хибний ввід");
             }
-            else
-                System.out.println("Введіть коректне значення");
         }
     }
 
     private void PaySeller(int key){
+        Log.setupLogger(logger);
         int itemCost = ammunitionItemList.get(key-1).getCost();
 
         for (Account account: accounts) {
@@ -47,10 +56,18 @@ public class BuyItem implements Command {
                     knight.setWallet(knight.getWallet() - itemCost);
 
                     knight.addItem(ammunitionItemList.get(key - 1));
+
+                    if (knight.checkIfAlreadySelected(ammunitionItemList.get(key - 1)))
+                        logger.log(Level.INFO, "Knight bought ammunition item");
+                    else
+                        logger.log(Level.INFO, "Knight already bought this item");
                     ammunitionItemList.remove(key - 1);
+
                 }
-                else
+                else {
+                    logger.log(Level.INFO, "Knight did not have enough money to buy ammunition item");
                     System.out.println("Недостатньо коштів.");
+                }
             }
         }
     }

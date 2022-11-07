@@ -5,4 +5,7 @@ public class Breastplate extends Armor{
         super(name, weight, cost, protection, description);
         this.type="Нагрудник";
     }
+
 }
+
+

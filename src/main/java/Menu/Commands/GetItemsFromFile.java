@@ -8,15 +8,22 @@ import Ammunition.Weapons.Longbow;
 import Ammunition.Weapons.Staff;
 import Ammunition.Weapons.Sword;
 import Menu.Command;
+import Logger.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static Logger.ViaMail.sendMessage;
 
 public class GetItemsFromFile implements Command {
     List<AmmunitionItem> ammunitionItems;
     Account account;
+    private static final Logger logger = Logger.getLogger(GetItemsFromFile.class.getName());
+
     public GetItemsFromFile(List<AmmunitionItem> ammunitionItems, Account account) {
         this.ammunitionItems = ammunitionItems;
         this.account = account;
@@ -27,6 +34,7 @@ public class GetItemsFromFile implements Command {
     }
 
     public void execute() {
+        Log.setupLogger(logger);
         try {
             String FilePath;
             if (account instanceof Knight) {
@@ -97,9 +105,13 @@ public class GetItemsFromFile implements Command {
                 }
             }
             scanner.close();
+            logger.log(Level.INFO,"Added all items");
         }
         catch (IOException e){
             System.out.println("Файл не знайдено");
+            logger.log(Level.SEVERE,"File with ammunition not found",e);
+            sendMessage("Critical error occurred: " + e + "\nFile with ammunition not found");
+            new Exit().execute();
         }
     }
 }
