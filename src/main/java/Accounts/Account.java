@@ -2,7 +2,7 @@ package Accounts;
 
 import java.util.Objects;
 
-public class Account {
+public abstract class Account {
     String login;
     String password;
     String type;

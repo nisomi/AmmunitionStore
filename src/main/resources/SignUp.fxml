@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #1f4d2f;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UserInterface.SignUpController">
+    <children>
+        <AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #fafafa;">
+            <children>
+                <Button fx:id="SignUpButton" layoutX="335.0" layoutY="338.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="132.0" text="Зареєструватися" />
+                <TextField fx:id="LoginField" layoutX="300.0" layoutY="161.0" prefHeight="47.0" prefWidth="200.0" promptText="логін" />
+                <PasswordField fx:id="PasswordField" layoutX="300.0" layoutY="219.0" prefHeight="47.0" prefWidth="200.0" promptText="пароль" />
+                <Label layoutX="361.0" layoutY="132.0" text="Авторизація">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Label>
+            <TextField fx:id="WalletField" layoutX="300.0" layoutY="277.0" prefHeight="47.0" prefWidth="200.0" promptText="доступні кошти" />
+            </children>
+        </AnchorPane>
+    </children>
+</AnchorPane>

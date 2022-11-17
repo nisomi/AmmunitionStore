@@ -3,6 +3,7 @@ package Menu.Commands;
 import Ammunition.AmmunitionItem;
 import Menu.Command;
 import Logger.*;
+import javafx.scene.control.TextArea;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,19 +14,24 @@ import java.util.logging.Logger;
 public class SearchItemsByWeight implements Command {
     private final List<AmmunitionItem> ammunitionItemList;
     private static final Logger logger = Logger.getLogger(SearchItemsByWeight.class.getName());
-
-    public SearchItemsByWeight(List<AmmunitionItem> ammunitionItemList) {
+    int min,max;
+    private TextArea textArea;
+    public SearchItemsByWeight(List<AmmunitionItem> ammunitionItemList, int min, int max, TextArea textArea) {
         this.ammunitionItemList = ammunitionItemList;
+        this.min= min;
+        this.max=max;
+        this.textArea = textArea;
     }
 
     public void execute() {
         Log.setupLogger(logger);
 
         ammunitionItemList.sort(new AmmunitionItem.WeightComparator());
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Введіть мінімальне та максимальне значення ваги:");
-        for (AmmunitionItem ammunition : searchAmmunitionByWeight(scanner.nextInt(), scanner.nextInt())) {
-            System.out.println(ammunition);
+
+        for (AmmunitionItem ammunition : searchAmmunitionByWeight(min, max)) {
+            if (textArea!=null){
+                textArea.appendText(ammunition+"\n");
+            }
         }
         logger.log(Level.INFO, "searched items by weight");
     }

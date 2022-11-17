@@ -1,60 +1,54 @@
 package Menu.Commands;
 
-import Accounts.*;
+import Accounts.Account;
+import Accounts.Knight;
 import Ammunition.AmmunitionItem;
+import DataBase.DataBase;
 import Menu.Command;
-import Menu.Menu;
-import Logger.*;
+import Menu.Storage;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class SignUp implements Command {
-    List<Account> accounts;
-    private static final Logger logger = Logger.getLogger(SignUp.class.getName());
+    private String login;
+    private String password;
+    int wallet;
 
-    public SignUp(List<Account> accounts) {
-        this.accounts = accounts;
+    public SignUp(String login, String password, int wallet) {
+        this.login = login;
+        this.password = password;
+        this.wallet = wallet;
     }
 
+    @Override
     public void execute() {
-        Log.setupLogger(logger);
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Введіть логін:");
-        try {
-            String login = scanner.nextLine();
-            if (!CheckIfExist(login)) {
-                System.out.println("Введіть пароль:");
-                String password = scanner.nextLine();
-                System.out.println("Доступні кошти:");
-                int money = scanner.nextInt();
-                accounts.add(new Knight(login, password, money));
-                List<AmmunitionItem> ammunition = new ArrayList<>();
-                Menu menu = new Menu(accounts.get(accounts.size() - 1), ammunition, accounts);
-                logger.log(Level.INFO, "Signed up successfully as "+accounts.get(accounts.size() - 1).getType(), accounts.get(accounts.size() - 1).getClass());
-                while (true) {
-                    menu.printOptions();
-                    System.out.print("Ваш вибір:");
-                    int choice = scanner.nextInt();
-                    if (choice <= menu.getSize())
-                        menu.makeChoice(choice);
-                    if (choice == menu.getSize()) {
-                        return;
-                    }
-                }
-            } else {
-                System.out.println("Такий користувач вже існує, спробуйте ще раз");
+        List<Account> accounts = new ArrayList<>();
+        new GetAccounts(accounts).execute();
+        List<AmmunitionItem> ammunition = new ArrayList<>();
+        new GetItems(ammunition).execute();
+        if (!CheckIfExist(login, accounts)) {
+            PreparedStatement statement;
+            Knight new_knight = new Knight(login,password,wallet);
+            accounts.add(new_knight);
+            String query = "INSERT INTO users (login,password,user_type,wallet) VALUES ('" + login + "' ,'" + password + "' ," + "'Лицар'" + ", " + wallet + ")";
+            statement = DataBase.getInstance().prepareStatement(query);
+            try {
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-        }catch (InputMismatchException | NumberFormatException e) {
-            System.out.println("Хибний ввід");
+            new Storage(new_knight,ammunition);
         }
-
     }
-    private boolean CheckIfExist(String login){
+    private boolean CheckIfExist(String login, List<Account> accounts){
         for (Account account : accounts) {
             if (account.getLogin().equals(login)) {
                 return true;

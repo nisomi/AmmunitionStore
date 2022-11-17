@@ -24,9 +24,6 @@ public class Knight extends Account {
     public void addItem(AmmunitionItem item){
         if (!checkIfAlreadySelected(item))
             ammunitionItems.add(item);
-        else{
-            System.out.println("Помилка, елемент з цієї категорії вже обрано");
-        }
     }
 
     public boolean checkIfAlreadySelected(AmmunitionItem item){

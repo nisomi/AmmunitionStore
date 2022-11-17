@@ -7,56 +7,65 @@ import Ammunition.Weapons.Dagger;
 import Ammunition.Weapons.Longbow;
 import Ammunition.Weapons.Staff;
 import Ammunition.Weapons.Sword;
+import DataBase.DataBase;
 import Menu.Command;
 import Logger.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static Logger.ViaMail.sendMessage;
 
-public class GetItemsFromFile implements Command {
+public class GetItems implements Command {
     List<AmmunitionItem> ammunitionItems;
     Account account;
-    private static final Logger logger = Logger.getLogger(GetItemsFromFile.class.getName());
+    private static final Logger logger = Logger.getLogger(GetItems.class.getName());
 
-    public GetItemsFromFile(List<AmmunitionItem> ammunitionItems, Account account) {
+    public GetItems(List<AmmunitionItem> ammunitionItems, Account account) {
         this.ammunitionItems = ammunitionItems;
         this.account = account;
     }
 
-    public GetItemsFromFile(List<AmmunitionItem> ammunitionItems) {
+    public GetItems(List<AmmunitionItem> ammunitionItems) {
         this.ammunitionItems = ammunitionItems;
     }
 
     public void execute() {
+        PreparedStatement statement;
+        ResultSet resultSet;
+
         Log.setupLogger(logger);
         try {
-            String FilePath;
             if (account instanceof Knight) {
-                FilePath = "E:\\2 курс\\1 сем\\ПП\\Ammunition\\ammunitionFor" + account.getLogin() + ".txt";
+                String query = "SELECT * FROM ammunition where userID = (SELECT userID FROM users where login = '"+account.getLogin()+"' )";
+                statement = DataBase.getInstance().prepareStatement(query);
+                try {
+                    resultSet = statement.executeQuery(query);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
             else {
-                FilePath = "E:\\2 курс\\1 сем\\ПП\\Knight.txt";
+                String query = "SELECT * FROM ammunition where userID is null";
+                statement = DataBase.getInstance().prepareStatement(query);
+                try {
+                    resultSet = statement.executeQuery(query);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            File file = new File(FilePath);
-            if(!file.exists()){
-                file.createNewFile();
-            }
-            Scanner scanner = new Scanner(file);
-            while (scanner.hasNextLine()) {
-                String[] data = scanner.nextLine().split("_");
-                String type = data[0];
-                String name = data[1];
-                int weight = Integer.parseInt(data[2]);
-                int cost = Integer.parseInt(data[3]);
-                int protection = Integer.parseInt(data[4]);
-                int damage = Integer.parseInt(data[4]);
-                String description = data[5];
+            while (resultSet.next()){
+                String type = resultSet.getString("type");
+                String name = resultSet.getString("name");
+                int weight = resultSet.getInt("weight");
+                int cost = resultSet.getInt("cost");
+                int protection = resultSet.getInt("protection");
+                int damage = resultSet.getInt("damage");
+                String description = resultSet.getString("description");
                 switch (type) {
                     case "Чоботи": {
                         ammunitionItems.add(new Boots(name, weight, cost, protection, description));
@@ -104,14 +113,12 @@ public class GetItemsFromFile implements Command {
                     }
                 }
             }
-            scanner.close();
             logger.log(Level.INFO,"Added all items");
-        }
-        catch (IOException e){
-            System.out.println("Файл не знайдено");
-            logger.log(Level.SEVERE,"File with ammunition not found",e);
-            sendMessage("Critical error occurred: " + e + "\nFile with ammunition not found");
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE,"database with accounts not found",e);
+            sendMessage("Critical error occurred: " + e + "\nDB with accounts not found");
             new Exit().execute();
         }
     }
+
 }
